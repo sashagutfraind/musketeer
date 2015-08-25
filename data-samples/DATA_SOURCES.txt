@@ -1,0 +1,41 @@
+Catalog of network sources
+
+arenas_email.edges
+------------------
+Email communication network from a university
+Please cite/see:
+R. Guimerà, L. Danon, A. Díaz-Guilera, F. Giralt, and A. Arenas 
+Phys. Rev. E 68, 065103(R) (2003) [4 pages]
+Self-similar community structure in a network of human interactions
+http://pre.aps.org/abstract/PRE/v68/i6/e065103
+
+ftp3c.elist
+-----------
+Hierarchical undeground terrorist network FTP
+Please cite/see:
+Optimizing Topological Cascade Resilience Based on the Structure of Terrorist Networks
+Alexander Gutfraind
+PLoS ONE: Research Article, published 10 Nov 2010
+
+
+karate.adjlist
+-----------------------
+Collaboration network from network science
+Please cite/see:
+W. W. Zachary, An information flow model for conflict and fission in small groups, Journal of Anthropological Research 33, 452-473 (1977).
+
+
+newman06_netscience.gml
+-----------------------
+Collaboration network from network science
+Please cite/see:
+M. E. J. Newman, Phys. Rev. E 74, 036104 (2006).
+
+
+watts_strogatz98_power.elist
+-----------------------
+Western Interconnection power grid
+Please cite/see:
+D. J. Watts and S. H. Strogatz, Nature 393, 440-442 (1998).
+
+

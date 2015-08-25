@@ -1,0 +1,177 @@
+2013-11-??: Version 1.2:
+------------------------
+Changes
+- parameters algorithm_for_coarsening and algorithm_for_uncoarsening introduce support for user-defined coursening/uncoarsening functions
+- additional parameters
+- support for control of runningtime bound
+- new_alg
+
+
+2013-07-06: Version 1.11:
+------------------------
+Changes
+- replica.predecessor_graph is renamed to replica.coarser_graph
+- computes Jaccard similarity coefficient
+
+2013-03-26: Version 1.1:
+------------------------
+Changes
+-removed edit_method:alternating
+-improved reporting of output
+-added option: post_processor
+-support of deep_copying (not fully tested yet)
+-removed obsolete 'error_rate'
+-added validation for the names of all parameters given in the input
+-cleanup of uncoarsening code
+-retain_intermediates parameter now makes the algorithm return intermediate graphs
+-disabled deferential detachment by default
+
+
+2012-11-18: Version 1.02:
+------------------------
+Changes
+-update the help file
+-support for growth in the number of edges
+-support for editing with a W-cycle (to replace deprecated edit_method:alternating)
+
+Bug fix:
+-fixed severe bug when enforcing connected graphs.  affecting primarily edit_method:alternating
+
+2012-10-01: Version 1.01:
+------------------------
+Changes
+-support for Graphviz (.dot) format on systems without pygraphviz, especially Windows
+-support for operation on graph components (using algorithms.musketeer_on_components)
+-support for generation of snapshots
+
+
+2012-07-18: Version 1.0:
+------------------------
+Changes
+-support for rendering in Linux (graphviz version 2.26.2)
+-improved interpolation: better resampling
+-memoriless interpolation for better ananymization
+
+2012-07-17: Version 1.0:
+------------------------
+Released as 1.0 without changes
+
+2012-06-21: Version 0.92:
+---------------------------------
+Changes
+-more advanced visualization of graphs using commandline option: -v sfdp3d
+
+Bug fixes
+-output bug in compare_nets
+
+~sasha
+
+2012-05-14: Version 0.91:
+---------------------------------
+Changes
+-simple support for node and edge attributes through resampling
+-new command line options
+-accept_chance_edges allows more control
+
+Bug fixes
+-
+
+~sasha
+
+
+2012-04-16: Version 0.90:
+---------------------------------
+Changes
+-New parameter 'preserve_clustering_on_deletion' improves accuracy of the clustering metric in replicas for highly clustered original networks
+-Performance improvements by optimization of calls to common methods
+
+Bug fixes
+-
+
+~sasha.
+
+2012-04-04: Version 0.89:
+---------------------------------
+Changes
+-Optional algorithm that alternatives between deletion and insertion
+-Optional algorithm for fine insertion of edges at distance 2 in order to avoid damaging clustering.
+-Option to removing evaluation of network properties (-N)
+
+Bug fixes
+-
+
+~sasha.
+
+
+
+2012-03-06: Version 0.88:
+---------------------------------
+Changes
+-Deferential detachment and edge_welfare mechanisms.
+-New way of computing locality
+
+Bug fixes
+-Clustering is handled better
+
+~sasha.
+
+
+2012-02-13: Version 0.87:
+---------------------------------
+Changes
+- Records the random generator seed in case the replication must be replicated.
+- edge weights are now used during coarsening and propagated down the v-cycle
+  during coarsening, node u attaches to the neighboring seed with the strong edge weight (seed,u) 
+  however, the final graph does not retain the weights
+- more straight-forward handling of new edges
+- improved debugging support
+
+Bug fixes
+- handling of horizon in a special case 
+
+~sasha.
+
+
+2012-01-29: Version 0.86:
+---------------------------------
+Changes
+- More accurate handling of locality
+- Coarsening stops automatically if no deeper edits are given
+- Customizable output format
+
+Bug fixes
+- 
+
+Known problems
+-
+
+~Sasha
+
+2012-01-16: Version 0.85:
+---------------------------------
+Changes
+- 
+Bug fixes
+- Fixes to locality handling
+- Fix to edge and node deflation
+
+Known problems
+-
+
+~Sasha
+
+
+2012-01-14: Version 0.8
+---------------------------------
+Changes
+- Refactoring of main loop
+- Disable minorization of deleted nodes
+- Revision of the creation of edges
+
+Bug fixes
+- Fixes to locality handling
+
+Known problems
+- Suspect bug in locality
+
+~Sasha
