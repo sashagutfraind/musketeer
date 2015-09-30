@@ -22,7 +22,7 @@ import networkx as nx
 import matplotlib
 #matplotlib.use('PDF')
 import pdb
-import cPickle
+import pickle
 import subprocess
 
 np.seterr(all='raise')
@@ -44,7 +44,7 @@ def ergm_replicate(original, params=None):
 
 def expected_degree_replicate(original, params=None):
 #generate the Chung-Lu expected degree model
-    replica = nx.generators.expected_degree_graph(w=nx.degree(original).values(), selfloops=False)
+    replica = nx.generators.expected_degree_graph(w=list(nx.degree(original).values()), selfloops=False)
 
     return replica
 
@@ -63,7 +63,7 @@ def random_noise_replicate(original, params=None):
         edited_edges = random.sample(G.edges(), npr.binomial(ne, epsilon))
         random.shuffle(edited_edges)
         num_edits = len(edited_edges) / 2
-        for idx in xrange(num_edits):
+        for idx in range(num_edits):
             edgeA = edited_edges[idx]
             edgeB = edited_edges[idx + num_edits]
 
@@ -98,7 +98,7 @@ def kronecker_replicate(original=None, params=None):
     kronfit_path = params.get('kronfit_path', 'krontools/kronfit')
     krongen_path = params.get('krongen_path', 'krontools/krongen')
     if not os.path.exists(krongen_path):
-        raise Exception, 'krongen is not found in path "%s".  Please compile krongen (SNAP library) and specify path wtih the parameter "krongen_path"'%krongen_path
+        raise Exception('krongen is not found in path "%s".  Please compile krongen (SNAP library) and specify path wtih the parameter "krongen_path"'%krongen_path)
     
     base_path =  'output/krondump/kron_%d'%npr.randint(1E6)
     stdout_path  = base_path+'_out.txt'
@@ -112,7 +112,7 @@ def kronecker_replicate(original=None, params=None):
         nx.write_edgelist(nx.convert_node_labels_to_integers(original), original_path, data=False)
         matrix_path   = base_path+'_mat.txt'
         num_iterations = params.get('num_iterations', 50)
-        print 'Fitting (%d iterations)...'%num_iterations
+        print('Fitting (%d iterations)...'%num_iterations)
         #fitter_cmdl=["krontools/kronfit", "-gi:%d -i:%s -o:%s > %s 2> %s &"%(num_iterations,original_path,matrix_path,stdout_path,stderr_path)]
         fitter_cmdl=[kronfit_path, "-gi:%d"%num_iterations, "-i:%s"%original_path, 
                       "-o:%s"%matrix_path, ">", "%s"%stdout_path, "2>", "%s"%stderr_path, "&"]
@@ -148,7 +148,7 @@ def kronecker_replicate(original=None, params=None):
     replica = nx.read_edgelist(replica_path) #this format does not show any singletons, so we will have to rebuild them ...
     assert not replica.is_directed()  #the algorithm naturally generates digraphs
     replica = nx.convert_node_labels_to_integers(replica)
-    for node in xrange(int(dimension**num_generator_iterations)):
+    for node in range(int(dimension**num_generator_iterations)):
         if not replica.has_node(node):
             replica.add_node(node)
     return replica
@@ -179,22 +179,22 @@ def test1():
     assert graphutils.graph_santity_test(rand_noise2)
     assert graphutils.graph_santity_test(kron)
 
-    print 'Test 1 passed!'
+    print('Test 1 passed!')
 
 def test2_sf():
     G = nx.path_graph(1000)
     replica = scalefree_replicate(G)
-    print 'Original:'
-    print G.number_of_nodes(), G.number_of_edges()
-    print 'Replica:'
-    print replica.number_of_nodes(), replica.number_of_edges()
+    print('Original:')
+    print(G.number_of_nodes(), G.number_of_edges())
+    print('Replica:')
+    print(replica.number_of_nodes(), replica.number_of_edges())
 
     G = nx.erdos_renyi_graph(900, p=0.01)
     replica = scalefree_replicate(G)
-    print 'Original:'
-    print G.number_of_nodes(), G.number_of_edges()
-    print 'Replica:'
-    print replica.number_of_nodes(), replica.number_of_edges()
+    print('Original:')
+    print(G.number_of_nodes(), G.number_of_edges())
+    print('Replica:')
+    print(replica.number_of_nodes(), replica.number_of_edges())
 
 def watts_strogatz_replicate(original, params=None):
 #warning: for simplicity of coding, the replica uses nodes labeled 0..n-1

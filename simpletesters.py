@@ -23,7 +23,7 @@ import networkx as nx
 #import matplotlib.pylab as pylab
 #import pylab
 import pdb
-import cPickle
+import pickle
 import graphutils
 
 np.seterr(all='raise')
@@ -32,7 +32,7 @@ timeNow = lambda : time.strftime('%Y_%m_%d__%H_%M_%S', time.localtime())
        
 def integrity_test():
     import algorithms
-    print 'Integrity testing ...'
+    print('Integrity testing ...')
     graphs = {'karate': nx.generators.karate_club_graph(),
               'er200_025': nx.erdos_renyi_graph(n=200, p=0.25, seed=17),
               'er200_0001': nx.erdos_renyi_graph(n=200, p=0.001, seed=42)}
@@ -42,8 +42,8 @@ def integrity_test():
               'edge_edit_rate': [0],
               'node_growth_rate': [0],
               'verbose':False}
-    for name,G in graphs.items():
-        print name
+    for name,G in list(graphs.items()):
+        print(name)
         replica = algorithms.generate_graph(original=G, params=params)
 
         diff    = graphutils.graph_graph_delta(G, replica)
@@ -52,14 +52,14 @@ def integrity_test():
         assert diff['new_nodes'] == []
         assert diff['del_edges'] == []
         
-    print 'Integrity test: PASSED'
+    print('Integrity test: PASSED')
 
 def iterated_test(seed=None, testparams=None, params=None):        
     import algorithms
-    print 'Starting iterative replication test...'
+    print('Starting iterative replication test...')
     if seed == None:
         seed = npr.randint(1E6)
-        print 'Setting random number generator seed: %d'%seed
+        print('Setting random number generator seed: %d'%seed)
         random.seed(seed)
         npr.seed(seed)
     if params == None:
@@ -67,8 +67,8 @@ def iterated_test(seed=None, testparams=None, params=None):
     defparams = {'edge_edit_rate':[0.05, 0.05], 'node_edit_rate':[0.05, 0.05], 'verbose':False, }
     defparams.update(params)
     params = defparams
-    print 'params'
-    print params
+    print('params')
+    print(params)
     if testparams == None:
         testparams = {}
     if 'G' not in testparams:
@@ -81,28 +81,28 @@ def iterated_test(seed=None, testparams=None, params=None):
     alg = testparams.get('algorithm', algorithms.generate_graph)
 
     num_rounds = testparams.get('num_rounds', 10)
-    print 'Round: 1. Initial graph ' + getattr(G, 'name', '_')
-    for trial in xrange(2, num_rounds+1):
+    print('Round: 1. Initial graph ' + getattr(G, 'name', '_'))
+    for trial in range(2, num_rounds+1):
         new_G = alg(original=G, params=params)
         seed = npr.randint(1E6)
-        print 'Round: %d. New seed: %d'%(trial,seed)
+        print('Round: %d. New seed: %d'%(trial,seed))
         random.seed(seed)
         npr.seed(seed)
-    print 'PASSED'
+    print('PASSED')
 
 def smoke_test():
     import algorithms
-    print 'Smoke testing ...'
+    print('Smoke testing ...')
     graphs = {'karate': nx.generators.karate_club_graph(),
               'er200_025': nx.erdos_renyi_graph(n=200, p=0.25, seed=42),
               'er200_0001': nx.erdos_renyi_graph(n=200, p=0.001, seed=42)}
 
     params = {'verbose':False,
-              'node_edit_rate': [0.1/(1.+i) for i in xrange(100)],
-              'edge_edit_rate': [0.1/(1.+i) for i in xrange(100)],
-              'node_growth_rate': [0.1/(1.+i) for i in xrange(100)]}
-    for name,G in graphs.items():
-        print name
+              'node_edit_rate': [0.1/(1.+i) for i in range(100)],
+              'edge_edit_rate': [0.1/(1.+i) for i in range(100)],
+              'node_growth_rate': [0.1/(1.+i) for i in range(100)]}
+    for name,G in list(graphs.items()):
+        print(name)
         #print '  nn=%d,ne=%d'%(G.number_of_nodes(), G.number_of_edges())
         replica = algorithms.generate_graph(original=G, params=params)
         #print '  nn=%d,ne=%d'%(replica.number_of_nodes(), replica.number_of_edges())
@@ -111,8 +111,8 @@ def smoke_test():
     assert 0 == os.system(graphutils.MUSKETEER_EXAMPLE_CMD)
         
 
-    print 'Smoke test: PASSED'
-    print
+    print('Smoke test: PASSED')
+    print()
     return
 
 #we use a dict, for possible future detailed testing code, such as testing for numerical range
@@ -174,25 +174,25 @@ def validate_params(params):
     for k in params:
         if k not in valid_params and (not str(k).startswith('_')):
             if params.get('verbose', True):
-                print 'Unknown or undocumented parameter: %s'%k
-                print 'Hint: for a list of valid parameters, see valid_params variable in simpletesters.py'
-                print
+                print('Unknown or undocumented parameter: %s'%k)
+                print('Hint: for a list of valid parameters, see valid_params variable in simpletesters.py')
+                print()
             bad_params = True
     
     if params.get('memoriless_interpolation', False) and params.get('deep_copying', True):
         if params.get('verbose', True):
-            print 'Memoriless_interpolation=True requires deep_copying=False'
+            print('Memoriless_interpolation=True requires deep_copying=False')
         bad_params = True
 
     if params.get('stats_report_on_all_levels', False) and not params.get('retain_intermediates'):
         if params.get('verbose', True):
-            print 'Making retain_intermediates=True'
+            print('Making retain_intermediates=True')
         params['retain_intermediates'] = True
 
 
     if bad_params and not params.get('skip_param_sanity_check', False):
         if params.get('verbose', True):
-            print 'Existing ...'
+            print('Existing ...')
         sys.exit(1)
 
 

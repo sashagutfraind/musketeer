@@ -198,7 +198,7 @@ def induced_graph(partition, graph) :
     True
     """
     ret = nx.Graph()
-    ret.add_nodes_from(partition.values())
+    ret.add_nodes_from(list(partition.values()))
     
     for node1, node2, datas in graph.edges_iter(data = True) :
         weight = datas.get("weight", 1)
@@ -213,7 +213,7 @@ def induced_graph(partition, graph) :
 def louvain_modularity(G, **kwargs):
     best_q = -np.inf
     
-    for trial in xrange(kwargs.get('num_trials', 5)):
+    for trial in range(kwargs.get('num_trials', 5)):
         parttn = best_partition(G)
         best_q = max(best_q, modularity(parttn, G))
 
@@ -265,7 +265,7 @@ def modularity(partition, graph) :
     for node in graph :
         com = partition[node]
         deg[com] = deg.get(com, 0.) + graph.degree(node, weight='weight')
-        for neighbor, datas in graph[node].iteritems() :
+        for neighbor, datas in graph[node].items() :
             weight = datas.get("weight", 1)
             if partition[neighbor] == com :
                 if neighbor == node :
@@ -316,7 +316,7 @@ def partition_at_level(dendogram, level) :
     """
     partition = dendogram[0].copy()
     for index in range(1, level + 1) :
-        for node, community in partition.iteritems() :
+        for node, community in partition.items() :
             partition[node] = dendogram[index][community]
     return partition
     
@@ -336,7 +336,7 @@ def __insert(node, com, weight, status) :
 def __load_binary(data) :
     """Load binary graph as used by the cpp implementation of this algorithm
     """
-    if type(data) == types.StringType :
+    if type(data) == bytes :
         data = open(data, "rb")
         
     reader = array.array("I")
@@ -350,7 +350,7 @@ def __load_binary(data) :
     reader.fromfile(data, num_links)
     links = reader.tolist()
     graph = nx.Graph()
-    graph.add_nodes_from(range(num_nodes))
+    graph.add_nodes_from(list(range(num_nodes)))
     prec_deg = 0
     
     for index in range(num_nodes) :
@@ -383,7 +383,7 @@ def __neighcom(node, graph, status) :
     with the decomposition node2com
     """
     weights = {}
-    for neighbor, datas in graph[node].iteritems() :
+    for neighbor, datas in graph[node].items() :
         if neighbor != node :
             weight = datas.get("weight", 1)
             neighborcom = status.node2com[neighbor]
@@ -414,7 +414,7 @@ def __one_level(graph, status) :
                     neigh_communities.get(com_node, 0.), status)
             best_com = com_node
             best_increase = 0
-            for com, dnc in neigh_communities.iteritems() :
+            for com, dnc in neigh_communities.items() :
                 incr =  dnc  - status.degrees.get(com, 0.) * degc_totw
                 if incr > best_increase :
                     best_increase = incr
@@ -445,7 +445,7 @@ def __renumber(dictionary) :
     ret = dictionary.copy()
     new_values = dict([])
     
-    for key in dictionary.keys() :
+    for key in list(dictionary.keys()) :
         value = dictionary[key]
         new_value = new_values.get(value, -1)
         if new_value == -1 :
@@ -518,7 +518,7 @@ class Status :
                 self.degrees[com] = self.degrees.get(com, 0) + deg
                 self.gdegrees[node] = deg
                 inc = 0.
-                for neighbor, datas in graph[node].iteritems() :
+                for neighbor, datas in graph[node].items() :
                     weight = datas.get("weight", 1)
                     if part[neighbor] == com :
                         if neighbor == node :
@@ -547,7 +547,7 @@ def test_demo():
     count = 0.
     for com in set(partition.values()) :
         count = count + 1.
-        list_nodes = [nodes for nodes in partition.keys()
+        list_nodes = [nodes for nodes in list(partition.keys())
                                     if partition[nodes] == com]
         nx.draw_networkx_nodes(G, pos, list_nodes, node_size = 20,
                                 node_color = str(count / size))
@@ -558,7 +558,7 @@ def test_Kpart():
     def build_block_G(pin=0.1, pout=0.01, block_size=32, num_blocks=4):
         G = nx.Graph()
         nn = block_size*num_blocks
-        G.add_nodes_from([i for i in xrange(nn)])
+        G.add_nodes_from([i for i in range(nn)])
 
         for nodeA in G:
             for nodeB in G:
@@ -573,12 +573,12 @@ def test_Kpart():
     
     K1d0 = build_block_G(pin=1, pout=0.01)
     parttn = best_partition(K1d0)
-    print 'Q: %f'%modularity(parttn, K1d0)
+    print('Q: %f'%modularity(parttn, K1d0))
     #assert q_score == 
 
     K0d5 = build_block_G(pin=0.5, pout=0.01)
     parttn = best_partition(K0d5)
-    print 'Q: %f'%modularity(parttn, K0d5)
+    print('Q: %f'%modularity(parttn, K0d5))
     #assert q_score == 
     
     #for elem, part in parttn.iteritems() :
@@ -593,15 +593,15 @@ def __main() :
         #graph = __load_binary(filename)
         graph = graphutils.load_graph(path=filename)
         partition = best_partition(graph)
-        print >> sys.stderr, str(modularity(partition, graph))
-        for elem, part in partition.iteritems() :
-            print str(elem) + " " + str(part)
+        print(str(modularity(partition, graph)), file=sys.stderr)
+        for elem, part in partition.items() :
+            print(str(elem) + " " + str(part))
     except (IndexError, IOError):
-        print "Usage : ./community filename"
-        print "find the communities in graph filename and display the dendogram"
-        print "Parameters:"
-        print "filename is a binary file as generated by the "
-        print "convert utility distributed with the C implementation"
+        print("Usage : ./community filename")
+        print("find the communities in graph filename and display the dendogram")
+        print("Parameters:")
+        print("filename is a binary file as generated by the ")
+        print("convert utility distributed with the C implementation")
 
     
 
