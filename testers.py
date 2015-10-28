@@ -32,7 +32,6 @@ Parallel = joblib.Parallel
 delayed  = joblib.delayed
 
 import algorithms
-import benchmarks
 import graphutils
 import simpletesters
 
@@ -238,7 +237,8 @@ def drake_hougardy_test():
 
 
 
-def edge_attachment_test(seed=None):
+def edge_attachment_test(editing_demo_draw_func, seed=None):
+    #show editing in progress. requires a function for comparing two networks
     import math
     if seed==None:
         seed = npr.randint(1E6)
@@ -260,7 +260,7 @@ def edge_attachment_test(seed=None):
         print added_edges_set
         print 'deled edges: '
         print deled_edges_set
-        benchmarks.editing_demo_draw(G=old_G, new_G=G, seed=1, pos=pos)
+        editing_demo_draw_func(G=old_G, new_G=G, seed=1, pos=pos)
         print tpl_data
         pylab.show()
 
