@@ -2,7 +2,7 @@
 '''
 Multiscale Entropic Network Generator 2 (MUSKETEER2)
 
-Copyright (c) 2011-2015 by Alexander Gutfraind and Ilya Safro. 
+Copyright (c) 2011-2018 by Alexander Gutfraind and Ilya Safro.
 All rights reserved.
 
 Use and redistribution of this file is governed by the license terms in
@@ -34,7 +34,7 @@ timeNow = lambda : time.strftime('%Y_%m_%d__%H_%M_%S', time.localtime())
 
 MUSKETEER_EXAMPLE_CMD = 'python musketeer.py -p "{\'edge_edit_rate\':[0.1,0.01]}" -f data-samples/karate.adjlist -t adjlist -o output/karate_replica.edges'
 
-None_node = None  #key to indicate a not real node.  
+None_node = None  #key to indicate a not real node.
 
 #those are short methods (like lambda, but supporting pickling)
 def a_avg_degree(G):
@@ -71,7 +71,7 @@ def average_all_pairs_shortest_path(G):
 def average_all_pairs_shortest_path_GT(G):
     if nx.number_connected_components(G)>1:
         return METRIC_ERROR
-  
+
     import graph_tool, graph_tool.topology
     gtG = make_gt_graph(G)
     #gtDistances = graph_tool.topology.shortest_distance(g=gtG['G'], source=None, target=None, weights=gtG['edge_weights'], dense=True)
@@ -218,7 +218,7 @@ def algebraic_distance_dense(G, params={}):
         if val == 0.:
             val == 1.
         diag_vec.append(val)
-    diag_vec     = np.array(diag_vec)  
+    diag_vec     = np.array(diag_vec)
     diag_vec_inv = 1./diag_vec  #[1./val for val in diag_vec]
     DIAG     = np.diag(diag_vec)
     DIAGinv  = np.diag(diag_vec_inv)
@@ -299,9 +299,9 @@ def algebraic_distance_sparse(G, params={}):
     nn = H.number_of_nodes()
     #wishlist: sparse matrices
     ##LAP      = nx.laplacian_matrix(H)
-    #diag_vec = [H.node['weight'] for node in H] 
+    #diag_vec = [H.node['weight'] for node in H]
     #diag_vec     = np.array([H.node[u].get('weight', 1) for u in H])  #should consider degree?
-    diag_vec     = np.array([H.degree(u) for u in H])  
+    diag_vec     = np.array([H.degree(u) for u in H])
     diag_vec_inv = 1./diag_vec  #[1./val for val in diag_vec]
     full_range = range(nn)
     DIAG     = scipy.sparse.csr_matrix((diag_vec,     (full_range,full_range)))
@@ -372,7 +372,7 @@ def color_by_3d_distances(G, verbose):
     #cm=pylab.get_cmap('Paired')
     #cm=pylab.get_cmap('gist_rainbow')
     cm=pylab.get_cmap('RdBu')  #UFL
-    
+
     if verbose:
         print 'Computing edge colors ...'
     max_dis = 0
@@ -406,7 +406,7 @@ def color_by_3d_distances(G, verbose):
 
 
 def color_new_nodes_and_edges(G, original, params=None):
-#add red color to new components.  
+#add red color to new components.
 #use the option 'post_processor':graphutils.color_new_nodes_and_edges
     for node in G:
         G.node[node]['label'] = ''
@@ -437,7 +437,7 @@ def compare_nets(old_G, new_G, metrics=None, params={}):
 
     #TODO: at the moment, graph_graph_delta cannot find edges which were deleted then inserted back: it changes the edge attribute data
     errors = {}
-    if verbose: 
+    if verbose:
         delta = graph_graph_delta(old_G, new_G)
         num_changed_nodes = len(delta['new_nodes']) + len(delta['del_nodes'])
         num_changed_edges = len(delta['new_edges']) + len(delta['del_edges'])
@@ -454,7 +454,7 @@ def compare_nets(old_G, new_G, metrics=None, params={}):
         if met_info['optional'] > 0 or met_info['runningtime'] > runningtime_bound:
             continue
         try:
-            if verbose: 
+            if verbose:
                 sys.stdout.write(met_name.center(20))
                 sys.stdout.flush()
             old_value = met_func(old_G)
@@ -463,7 +463,7 @@ def compare_nets(old_G, new_G, metrics=None, params={}):
                 error = met_wt*float(new_value-old_value)/old_value
             else:
                 error = np.NaN
-            if verbose: 
+            if verbose:
                 outstr = ''
                 if np.abs(old_value) < 0.1 or np.abs(old_value) > 1000:
                     outstr += ('\t%.'+str(precision)+'e')%old_value
@@ -481,10 +481,10 @@ def compare_nets(old_G, new_G, metrics=None, params={}):
             print
             print 'Warning: could not compute '+met_name + ': '+str(inst)
     mean_error = np.average([np.abs(v[2]) for v in errors.values() if (v[2]!=np.NaN) and abs(v[2]-METRIC_ERROR) > 1])
-    if verbose: 
+    if verbose:
         print 'statistics end ------------------------------------------------------------'
         print 'Mean absolute difference: %.2f%%'%(100*mean_error)
-        
+
     return mean_error, errors
 
 def degree_assortativity(G):
@@ -496,7 +496,7 @@ def degree_assortativity(G):
     else:
         raise ValueError, 'Cannot compute degree assortativity: method not available'
 
-def drake_hougardy_slow(G): 
+def drake_hougardy_slow(G):
 #uses an implementation close to the pseudo-code in the paper
     assert not G.is_directed()
     H = nx.Graph()
@@ -506,7 +506,7 @@ def drake_hougardy_slow(G):
     H_adj = H.adj
     H_degree    = lambda u: H_adj[u].__len__()
     H_outedges  = lambda u: H.edge[u]
-    
+
 
     Matchings = ([],[])
     Weights   = [0.,0.]
@@ -515,7 +515,7 @@ def drake_hougardy_slow(G):
     #inspected_nodes = dict.from_keys(G.nodes(), False)
     ni             = G.nodes_iter()  #use G, not H
     #qx = ni.next()
-    
+
     while H.number_of_edges() > 0:
         try:
             x = ni.next()
@@ -523,7 +523,7 @@ def drake_hougardy_slow(G):
             break
         while x in H and H_degree(x) > 0:
             nbs = H_outedges(x)
-            nb_weights = [(nb,nbs[nb].get('weight', 1.0)) for nb in nbs] 
+            nb_weights = [(nb,nbs[nb].get('weight', 1.0)) for nb in nbs]
             y,wt_y = max(nb_weights, key=lambda x:x[1])
             Matchings[ind].append((x,y))
             Weights[ind] += wt_y
@@ -535,7 +535,7 @@ def drake_hougardy_slow(G):
     else:
         return dict(Matchings[1] + [(y,x) for (x,y) in Matchings[1]])
 
-def drake_hougardy(G, maximize=True): 
+def drake_hougardy(G, maximize=True):
     '''Compute a weighted matching of G using the Drake-Hougardy path growing algorithm.[1]
     The matching is guaranteed to have weight >= 0.5 of the maximumal weight matching
 
@@ -567,7 +567,7 @@ def drake_hougardy(G, maximize=True):
     Weights   = [0.,0.]
     ind       = 0
     ni        = G.nodes_iter()  #use G, not G
-    inspected = set()  #iff u in inspected, it has been already included in the matching.  
+    inspected = set()  #iff u in inspected, it has been already included in the matching.
     num_inspected_halfedges = 0
     num_edges = G.number_of_edges()
 
@@ -585,14 +585,14 @@ def drake_hougardy(G, maximize=True):
             num_inspected_halfedges += nbs.__len__()
             nb_weights = [(nb,nbs[nb].get('weight', 1.0)) for nb in nbs if nb not in inspected]
             if nb_weights.__len__() == 0:
-                continue 
+                continue
             y,wt_y = mx(nb_weights, key=lambda pair:pair[1])
             Matchings[ind].append((x,y))
             Weights[ind] += wt_y
             x = y
             ind = (ind + 1)%2
 
-     
+
     if Weights[0] > Weights[1]:
         best_matching = dict(Matchings[0] + [(y,x) for (x,y) in Matchings[0]])
     else:
@@ -607,7 +607,7 @@ def drake_hougardy(G, maximize=True):
         nbs = G_outedges(x)
         nb_weights = [(nb,nbs[nb].get('weight', 1.0)) for nb in nbs if nb not in best_matching]
         if nb_weights.__len__() == 0:
-            continue 
+            continue
         y,wt_y = mx(nb_weights, key=lambda pair:pair[1])
         best_matching[x] = y
         best_matching[y] = x
@@ -650,7 +650,7 @@ def graph_graph_delta(G, new_G, **kwargs):
     ret['jaccard_edges'] = jaccard_edges
 
     return ret
-    
+
 def graph_sanity_test(G, params=None):
     ok = True
     if G.number_of_nodes() == 0:
@@ -673,45 +673,43 @@ def graph_sanity_test(G, params=None):
             print 'Deleting!'
             G.remove_edges_from(selfloops)
             ok = False
-        
+
     return ok
 
- 
+
 def load_graph(path, params={}, list_types_and_exit=False):
     '''reads graph from path, using automatic detection of graph type
        to attempt AUTODETECTION use params['graph_type'] = AUTODETECT
     '''
 
     loaders = {
-            'adjlist':nx.read_adjlist, 
+            'adjlist':nx.read_adjlist,
             'adjlist_implicit':read_adjlist_implicit,
-            'adjlist_implicit_prefix':read_adjlist_implicit_prefix, 
-            'graph6':nx.read_graph6, 
-            'shp':nx.read_shp, 
-            'dot':nx.read_dot, 
-            'xdot':nx.read_dot, 
-            'graph6_list':nx.read_graph6_list,  
-            'sparse6':nx.read_sparse6, 
-            'edges':nx.read_edgelist, 
-            'elist':nx.read_edgelist, 
-            'edgelist':nx.read_edgelist, 
-            'graphml':nx.read_graphml,        
-            'sparse6_list':nx.read_sparse6_list, 
-            'gexf':nx.read_gexf,    
-            'leda':nx.read_leda,            
+            'adjlist_implicit_prefix':read_adjlist_implicit_prefix,
+            'graph6':nx.read_graph6,
+            'shp':nx.read_shp,
+            'dot':nx.drawing.nx_agraph.read_dot,
+            'xdot':nx.drawing.nx_agraph.read_dot,
+            'sparse6':nx.read_sparse6,
+            'edges':nx.read_edgelist,
+            'elist':nx.read_edgelist,
+            'edgelist':nx.read_edgelist,
+            'graphml':nx.read_graphml,
+            'gexf':nx.read_gexf,
+            'leda':nx.read_leda,
             'weighted_edgelist':nx.read_weighted_edgelist,
-            'gml':nx.read_gml, 
+            'gml':nx.read_gml,
             'multiline_adjlist':nx.read_multiline_adjlist,
             'yaml':nx.read_yaml,
-            'gpickle':nx.read_gpickle,           
+            'gpickle':nx.read_gpickle,
             'pajek':nx.read_pajek,}
 
     raw_loaders = {
-            'adjlist':nx.parse_adjlist, 
-            'elist':nx.parse_edgelist, 
-            'edgelist':nx.parse_edgelist, 
-            'gml':nx.parse_gml, 
-            'leda':nx.parse_leda,            
+            'adjlist':nx.parse_adjlist,
+            'elist':nx.parse_edgelist,
+            'edgelist':nx.parse_edgelist,
+            'gml':nx.parse_gml,
+            'leda':nx.parse_leda,
             'multiline_adjlist':nx.parse_multiline_adjlist,
             'pajek':nx.parse_pajek,
             }
@@ -828,7 +826,7 @@ def load_graph(path, params={}, list_types_and_exit=False):
 
     if G == None:
         raise Exception, 'Could not load graph.  None of the available loaders succeeded.'
-    
+
     #postprocessing
     if graph_type == 'dot':
         G.name = os.path.split(path)[1]  #otherwise the output is terrible
@@ -842,7 +840,7 @@ def load_graph(path, params={}, list_types_and_exit=False):
 
 def make_gt_graph(nxG):
     import graph_tool, graph_tool.topology
-    node_to_num  = dict(zip(nxG.nodes(), range(nxG.number_of_nodes()))) 
+    node_to_num  = dict(zip(nxG.nodes(), range(nxG.number_of_nodes())))
     gtG          = graph_tool.Graph(directed=nxG.is_directed())
     edge_weights = gtG.new_edge_property("double")
     gtG.add_vertex(nxG.number_of_nodes())
@@ -852,7 +850,7 @@ def make_gt_graph(nxG):
     return {'G':gtG, 'edge_weights':edge_weights, 'node_to_num':node_to_num}
 
 def powerlaw_mle(G, xmin=6.):
-    #estimate the power law exponent based on Clauset et al., http://arxiv.org/abs/0706.1062, 
+    #estimate the power law exponent based on Clauset et al., http://arxiv.org/abs/0706.1062,
     #for simplicity, we avoid the MLE calculation of Eq. (3.5) and instead use the approximation of Eq. (3.7)
     #the power law is only applied for nodes of degree > xmin, so it's not suitable for others
     degseq = G.degree().values()
@@ -863,13 +861,13 @@ def powerlaw_mle(G, xmin=6.):
         print 'Warning: the estimator uses an approximation which is not suitable for xmin < 6'
 
     degseqLn = [np.log(xi/(xmin-0.5)) for xi in degseq if xi >= xmin]
-    degseqLn.sort() #to reduce underflow. 
+    degseqLn.sort() #to reduce underflow.
 
     #print degseqLn
     return 1. + len(degseqLn) / sum(degseqLn)
 
 
- 
+
 def read_adjlist_implicit(path, comments = '#', delimiter = None,
                   create_using = None, nodetype = int):
     """Parse lines of a graph adjacency list representation.
@@ -925,7 +923,7 @@ def read_adjlist_implicit(path, comments = '#', delimiter = None,
             G.clear()
         except:
             raise TypeError("Input graph is not a NetworkX graph type")
-    
+
     with open(path, 'r') as file:
         lines = file.readlines()
 
@@ -956,7 +954,7 @@ def read_adjlist_implicit(path, comments = '#', delimiter = None,
         G.add_edges_from([(u, v) for v in vlist])
         linenum += 1
     return G
- 
+
 
 def read_adjlist_implicit_prefix(path, comments = '#', create_using=None):
     '''
@@ -964,16 +962,16 @@ def read_adjlist_implicit_prefix(path, comments = '#', create_using=None):
 
     "
     15606 45878
-    2 3 6 7 
-    1 4 6 9 
+    2 3 6 7
+    1 4 6 9
     "
     and so on.
     first line: num_nodes num_edges
     second lines (and the rest of the lines in the file):
-    [implicit node = line number - 1] neighbor1 neighbor2 ... 
+    [implicit node = line number - 1] neighbor1 neighbor2 ...
     empty lines are degree=0 nodes
     '''
-    
+
     if create_using == None:
         G = nx.Graph()
     else:
@@ -999,7 +997,7 @@ def read_adjlist_implicit_prefix(path, comments = '#', create_using=None):
         if 'node_num' not in locals():
             raise
         raise IOError, 'Parse error on line %d'%(node_num+1)
-    
+
     expected_num_nodes = int(header_data[0])
     expected_num_edges = int(header_data[1])
 
@@ -1011,7 +1009,7 @@ def read_adjlist_implicit_prefix(path, comments = '#', create_using=None):
 def safe_pickle(path, data, params=None):
     with open(path, 'wb') as f:
         cPickle.dump(data, f)
-        if type(params) != type({}) or params.get('verbose', True): 
+        if type(params) != type({}) or params.get('verbose', True):
             print 'pickled to: '+str(path)
 
 
@@ -1062,7 +1060,7 @@ def test_algebraic_distance():
         for node2 in G2:
             if sum(node1) > sum(node2):
                 continue
-            err2 += abs(distance2sp[node1][node2] - distance2[node1][node2]) 
+            err2 += abs(distance2sp[node1][node2] - distance2[node1][node2])
     err2 = err2/G.number_of_edges()
     print '  mean gap for pair: %.f'%(err2)
     assert err2 < 0.1
@@ -1095,10 +1093,10 @@ def test_bfs():
     assert 3 not in distances_path0
     assert 4 not in distances_path0
     distances_path1 = bfs_distance_with_horizon(G, source=1, horizon=2)
-    assert distances_path1[0] == 1     
-    assert distances_path1[1] == 0     
-    assert distances_path1[2] == 1     
-    assert distances_path1[3] == 2     
+    assert distances_path1[0] == 1
+    assert distances_path1[1] == 0
+    assert distances_path1[2] == 1
+    assert distances_path1[3] == 2
     assert 4 not in distances_path1
 
     ER100 = nx.erdos_renyi_graph(100, 0.02)
@@ -1162,7 +1160,7 @@ def write_dot_helper(G, path, encoding='utf-8'):
     #loses label information
     with open(path, mode='wb') as f:
         header = 'strict graph ' + getattr(G, 'name', 'replica') + ' {\n'.encode(encoding)
-        f.write(header) 
+        f.write(header)
         for line in nx.generate_edgelist(G, ' -- ', False):
             line =' %s;\n'%line
             f.write(line.encode(encoding))
@@ -1173,16 +1171,16 @@ def write_graph(G, path, params={}, list_types_and_exit=False):
     '''
 
     writers = {
-            'adjlist':nx.write_adjlist, 
-            'dot':nx.write_dot, 
-            'xdot':nx.write_dot, 
-            'edges':nx.write_edgelist, 
-            'elist':nx.write_edgelist, 
-            'edgelist':nx.write_edgelist, 
-            'weighted_edgelist':nx.write_weighted_edgelist, 
-            'graphml':nx.write_graphml,        
-            'gml':nx.write_gml, 
-            'gpickle':nx.write_gpickle,           
+            'adjlist':nx.write_adjlist,
+            'dot':nx.drawing.nx_agraph.write_dot,
+            'xdot':nx.drawing.nx_agraph.write_dot,
+            'edges':nx.write_edgelist,
+            'elist':nx.write_edgelist,
+            'edgelist':nx.write_edgelist,
+            'weighted_edgelist':nx.write_weighted_edgelist,
+            'graphml':nx.write_graphml,
+            'gml':nx.write_gml,
+            'gpickle':nx.write_gpickle,
             'pajek':nx.write_pajek,
             'yaml':nx.write_yaml}
     if os.name == 'nt':
@@ -1205,7 +1203,7 @@ def write_graph(G, path, params={}, list_types_and_exit=False):
             print inst
 
             print 'Attempting to write to DOT format'
-            nx.write_dot(G, path)
+            nx.drawing.nx_agraph.write_dot(G, path)
             print 'Done.'
     else:
         raise Exception,'Unable to write graphs of type: '+str(graph_type)
@@ -1239,7 +1237,7 @@ default_metrics += [{'name':'powerlaw exp',          'weight':1, 'optional':0, '
 #'optional' runs from 0 (always used) to 5 (never)
 
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     pass
     #test_graphtool_distance()
     #test_algebraic_distance()
@@ -1247,4 +1245,3 @@ if __name__ == '__main__':
     #test_average_path_length()
     #test_inverse_mean_path_length()
     #test_powerlaw_mle()
-

@@ -2,7 +2,7 @@
 '''
 Multiscale Entropic Network Generator 2 (MUSKETEER2)
 
-Copyright (c) 2011-2015 by Alexander Gutfraind and Ilya Safro. 
+Copyright (c) 2011-2018 by Alexander Gutfraind and Ilya Safro. 
 All rights reserved.
 
 Use and redistribution of this file is governed by the license terms in
@@ -110,7 +110,7 @@ def initialize():
               print a
               raise
        elif o in ('-s', '--seed'):
-          sgiven = True  
+          sgiven = True
           random.seed(int(a))
           npr.seed(int(a))
           print 'Warning: the random SEED was specified.'
@@ -177,11 +177,11 @@ def input_prompter():
         print 'found.'
 
     graph_type       = input_default('     file format (default: %s): '%str(graph_type), graph_type)
-    edge_edit_rate   = input_default('Edge edit rate (default: %s): '%str(edge_edit_rate), edge_edit_rate) 
-    node_edit_rate   = input_default('Node edit rate (default: %s): '%str(node_edit_rate), node_edit_rate) 
-    node_growth_rate = input_default('Node growth rate (default: %s): '%str(node_growth_rate), node_growth_rate) 
-    edge_growth_rate = input_default('Edge growth rate (default: %s): '%str(edge_growth_rate), edge_growth_rate) 
-    compare_replica  = input_default('Compare output to original (default: %s): '%str(False), False) 
+    edge_edit_rate   = input_default('Edge edit rate (default: %s): '%str(edge_edit_rate), edge_edit_rate)
+    node_edit_rate   = input_default('Node edit rate (default: %s): '%str(node_edit_rate), node_edit_rate)
+    node_growth_rate = input_default('Node growth rate (default: %s): '%str(node_growth_rate), node_growth_rate)
+    edge_growth_rate = input_default('Edge growth rate (default: %s): '%str(edge_growth_rate), edge_growth_rate)
+    compare_replica  = input_default('Compare output to original (default: %s): '%str(False), False)
     try:
         [float(x) for x in edge_edit_rate]
         [float(x) for x in node_edit_rate]
@@ -189,7 +189,7 @@ def input_prompter():
         [float(x) for x in edge_growth_rate]
     except:
         print 'Error parsing input!'
-        print 
+        print
         sys.exit(1)
 
 
@@ -208,7 +208,7 @@ def open_in_unix(image_path, verbose, ext='pdf'):
         if verbose:
             print cmdl
         ret=os.system(cmdl)
-        if ret == 0: 
+        if ret == 0:
             return
     if verbose:
         print 'Unable to open image file'
@@ -241,19 +241,19 @@ def show_usage():
     print '--verbose         Verbose output (Default: --verbose True)'
     print '-w, --write_graph Write replica to disc (Default: -w True).'
     print '                  For interactive Python make False to speed up generation (disables visualization).'
-    print 
+    print
     print 'For reading graphs with -t, the supported graph types are: \n%s'%graphutils.load_graph(path=None, list_types_and_exit=True)
-    print 
+    print
     print 'For writing graphs with -o, the supported graph extensions are: \n%s'%graphutils.write_graph(G=None, path=None, list_types_and_exit=True)
-    print 
-    print 
+    print
+    print
     print 'Example call format:'
     print graphutils.MUSKETEER_EXAMPLE_CMD
 
 
 
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     init_options = initialize()
     input_path   = init_options['input_path']
     params       = init_options['params']
@@ -300,12 +300,12 @@ if __name__ == '__main__':
         output_base = 'output/'+os.path.splitext(os.path.basename(input_path))[0]
         output_path     = output_base + '__' + t_str + '.dot'
         output_path_adj = output_base + '__' + t_str + '.adjlist'
-        if write_graph: 
+        if write_graph:
             if verbose:
                 print 'Saving graph: %s'%output_path_adj
             sys.stdout.flush()
             nx.write_adjlist(new_G, output_path_adj)
-    if write_graph: 
+    if write_graph:
         if verbose:
             print 'Saving graph: %s'%output_path
         sys.stdout.flush()
