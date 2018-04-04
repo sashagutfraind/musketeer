@@ -1,6 +1,6 @@
 Multiscale Entropic Network Generator 2 (MUSKETEER2)
 
-Copyright (c) 2011-2015 by Alexander Gutfraind and Ilya Safro. 
+Copyright (c) 2011-2018 by Alexander Gutfraind and Ilya Safro. 
 All rights reserved.
 
 Use and redistribution of this file is governed by the license terms in
@@ -10,7 +10,7 @@ Setup and Installation
 ----------------------
 Make sure your system has 
 1. Python 2.6 or 2.7
-2. NetworkX library (version >= 1.8)
+2. NetworkX library (version >= 1.10)
 3. numpy library (version >=1.5)
 
 You can check this by running 
