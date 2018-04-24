@@ -199,7 +199,7 @@ def algebraic_distance_dense(G, params={}):
     #H = nx.convert_node_labels_to_integers(Gcopy, label_attribute='orig_label')
     H = nx.convert_node_labels_to_integers(G, label_attribute='orig_label')
     #for singletons, we set diag=1
-    all_nodes = H.nodes()  #future: use this for sorting
+    all_nodes = list(H.nodes())  #future: use this for sorting
 
     distance = {}
     for node1 in all_nodes:
@@ -214,7 +214,7 @@ def algebraic_distance_dense(G, params={}):
     #diag_vec     = np.array([H.degree(u) for u in H])
     diag_vec = []
     for u in all_nodes:
-        val = 0. + sum(edge.get('weight', 1.) for edge in H.edge[u].values())
+        val = 0. + sum(edge.get('weight', 1.) for edge in H[u].values())
         if val == 0.:
             val == 1.
         diag_vec.append(val)
@@ -278,7 +278,7 @@ def algebraic_distance_sparse(G, params={}):
     num_test_vectors_K  = params.get('num_test_vectors_K', 50)
     lazy_walk_param_w   = params.get('lazy_walk_param_w', 0.5)
 
-    singletons = filter(lambda u: G.degree(u)==0, G.nodes())
+    singletons = filter(lambda u: G.degree(u)==0, list(G.nodes()))
     if len(singletons) == 0:
         Gcopy = G
     else:
@@ -377,7 +377,7 @@ def color_by_3d_distances(G, verbose):
         print 'Computing edge colors ...'
     max_dis = 0
     positions = {}
-    for u,v,data in G.edges_iter(data=True):
+    for u,v,data in G.edges(data=True):
         try:
             u_pos = positions[u]
         except:
@@ -396,7 +396,7 @@ def color_by_3d_distances(G, verbose):
 
         data['dis'] = dis
 
-    for u,v,data in G.edges_iter(data=True):
+    for u,v,data in G.edges(data=True):
         dis = data.pop('dis')
         #data['color'] = '"%.3f %.3f %.3f"'%tuple(cm(dis/max_dis)[:3])
         data['color'] = '%.3f %.3f %.3f'%tuple(cm(dis/max_dis)[:3])
@@ -415,7 +415,7 @@ def color_new_nodes_and_edges(G, original, params=None):
             G.node[node]['color']='black'
         else:
             G.node[node]['color']='blue'
-    for u,v,d in G.edges_iter(data=True):
+    for u,v,d in G.edges(data=True):
         if original.has_edge(u,v):
             d['color']='black'
         else:
@@ -505,15 +505,14 @@ def drake_hougardy_slow(G):
     #H = G.copy() #deep
     H_adj = H.adj
     H_degree    = lambda u: H_adj[u].__len__()
-    H_outedges  = lambda u: H.edge[u]
-
+    H_outedges  = lambda u: H[u]  #TODO: test access method and speed
 
     Matchings = ([],[])
     Weights   = [0.,0.]
     ind = 0
     #edges           = set(G.edges())
     #inspected_nodes = dict.from_keys(G.nodes(), False)
-    ni             = G.nodes_iter()  #use G, not H
+    ni             = G.nodes().iterkeys()  #use G, not H
     #qx = ni.next()
 
     while H.number_of_edges() > 0:
@@ -560,18 +559,18 @@ def drake_hougardy(G, maximize=True):
     '''
     assert not G.is_directed()
     G_adj = G.adj
-    G_outedges  = lambda u: G.edge[u]
+    G_outedges  = lambda u: G[u]  #TODO: test access method and speed
     mx = max
 
     Matchings = ([],[])
     Weights   = [0.,0.]
     ind       = 0
-    ni        = G.nodes_iter()  #use G, not G
+    ni        = G.nodes().iterkeys()  #use G, not G
     inspected = set()  #iff u in inspected, it has been already included in the matching.
     num_inspected_halfedges = 0
     num_edges = G.number_of_edges()
 
-    nodes = G.nodes()
+    nodes = list(G.nodes())
     try:
         npr.shuffle(nodes)    #wishlist: why does it fail on npr.shuffle([u'903', 1]) ??
     except:
@@ -667,7 +666,7 @@ def graph_sanity_test(G, params=None):
         ok = False
 
     if ok:
-        selfloops = G.selfloop_edges()
+        selfloops = list(G.selfloop_edges()) #list() for NX 2.1
         if selfloops != []:
             print 'Warning: self-loops detected (%d)'%len(selfloops)
             print 'Deleting!'
@@ -840,7 +839,7 @@ def load_graph(path, params={}, list_types_and_exit=False):
 
 def make_gt_graph(nxG):
     import graph_tool, graph_tool.topology
-    node_to_num  = dict(zip(nxG.nodes(), range(nxG.number_of_nodes())))
+    node_to_num  = dict(zip(list(nxG.nodes()), range(nxG.number_of_nodes())))
     gtG          = graph_tool.Graph(directed=nxG.is_directed())
     edge_weights = gtG.new_edge_property("double")
     gtG.add_vertex(nxG.number_of_nodes())

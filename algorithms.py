@@ -278,7 +278,7 @@ def do_coarsen(G, params):
         G_coarse.add_node(seed)
         G_coarse.node[seed]['weight'] = sum(G.node[nb].get('weight', 1.) for nb in aggregates[seed])
 
-        trapped_edges[seed] = G.subgraph(aggregates[seed]).edges(data=False)
+        trapped_edges[seed] = list(G.subgraph(aggregates[seed]).edges())
 
         for nb in aggregates[seed]:
             for nbnb in G.neighbors(nb):
@@ -289,14 +289,14 @@ def do_coarsen(G, params):
     for u,v in free_edges:
         s1 = home_nodes[u]
         s2 = home_nodes[v]
-        uv_edge_wt = G.edge[u][v].get('weight', 1.0)
+        uv_edge_wt = G[u][v].get('weight', 1.0)
         if (s1,s2) in merged_edges:
             merged_edges[(s1,s2)].append((u,v))
-            G_coarse.edge[s1][s2]['weight'] += uv_edge_wt
+            G_coarse[s1][s2]['weight'] += uv_edge_wt
             assert (v,u) not in merged_edges[(s1,s2)]
         elif (s2,s1) in merged_edges:
             merged_edges[(s2,s1)].append((u,v))
-            G_coarse.edge[s2][s1]['weight'] += uv_edge_wt
+            G_coarse[s2][s1]['weight'] += uv_edge_wt
             assert (v,u) not in merged_edges[(s2,s1)]
         else:
             G_coarse.add_edge(s1,s2, weight=uv_edge_wt)
@@ -341,7 +341,7 @@ def do_uncoarsen(G_coarse, c_data, params):
                 G_fine.add_edge(u,v)
             #u or v must have been deleted
 
-    for s1,s2 in G_coarse.edges_iter():
+    for s1,s2 in G_coarse.edges():
         if (s1,s2) in merged_edges:
             s1s2 = merged_edges[(s1,s2)]
         else:
@@ -392,7 +392,7 @@ def edit_edges_sequential(G, edge_edit_rate, edge_growth_rate, tpl_data, params)
     #do we allow leafs to be cut off completely?
     #   this option should be used sparingly, as it disrupts deferential detachment and decreases clustering
 
-    all_nodes = G.nodes()
+    all_nodes = list(G.nodes())
     added_edges_set = set()
     deled_edges_set = set()
     target_edges_to_delete = npr.binomial(max(G.number_of_edges(), 1), edit_rate)
@@ -404,7 +404,7 @@ def edit_edges_sequential(G, edge_edit_rate, edge_growth_rate, tpl_data, params)
 
     deprived_nodes = [] #list of nodes that lost edges, including repetitions
     deferential_detachment_factor = params.get('deferential_detachment_factor', 0.0)
-    avg_degree = np.average(nx.degree(G).values())  #inexact deferential detachment, but with a much higher sampling efficiency
+    avg_degree = np.average(dict(nx.degree(G)).values())  #inexact deferential detachment, but with a much higher sampling efficiency
     num_deletion_trials           = params.get('num_deletion_trials', int(round(avg_degree**2)) )
 
     G_adj = G.adj
@@ -526,7 +526,7 @@ def edit_nodes_sequential(G, node_edit_rate, node_growth_rate, tpl_data, params)
     G_degree    = lambda u: G_adj[u].__len__()
     G_neighbors = lambda u: G_adj[u].keys()
     #we cache edges-to-add to avoid skewing these statistics during the editing process
-    original_nodes = G.nodes()
+    original_nodes = list(G.nodes())
     added_node_info = {}
     for i in xrange(num_added_nodes):
         source_node = random.choice(original_nodes)
@@ -564,7 +564,7 @@ def edit_nodes_sequential(G, node_edit_rate, node_growth_rate, tpl_data, params)
 
     deled_nodes_set = set()
     minorizing_node_deletion = params.get('minorizing_node_deletion', False)
-    for u in random.sample(G.nodes(), num_deleted_nodes):
+    for u in random.sample(list(G.nodes()), num_deleted_nodes):
         num_edges_deleted += G_degree(u)
         if minorizing_node_deletion: #connect the neighbors into a tree
             nbrs = G_neighbors(u)
@@ -642,7 +642,7 @@ def find_node_to_friend_basic(G, head, tpl_data, params, existing_nbs=None):
             else:
                 for i in xrange(G.number_of_nodes()):
                     if all_nodes == None:
-                        all_nodes = G.nodes()
+                        all_nodes = list(G.nodes())
                     candidate = random.choice(all_nodes)
                     if candidate != head and (candidate not in existing_nbs):
                         tail = candidate
@@ -843,7 +843,7 @@ def interpolate_edges(G, c_data, model_map, fine_model_map, params):
 
     authentic_edges = merged_edges.items()
     edited_edges = []
-    for (s1,s2) in G.edges_iter(): #wishlist: faster loop?
+    for (s1,s2) in G.edges(): #wishlist: faster loop?
         if ((s1,s2) not in merged_edges) and ((s2,s1) not in merged_edges):
             edited_edges.append((s1,s2))
     for (s1,s2) in edited_edges:
@@ -1027,7 +1027,7 @@ def resample_attributes(G, replica, model_map, params):
     maintain_edge_attributes = params.get('maintain_edge_attributes', False)
     deep_copying             = params.get('deep_copying', True)
 
-    original_nodes = G.nodes()
+    original_nodes = list(G.nodes())
     G_adj = G.adj
     G_degree    = lambda u: G_adj[u].__len__()
     G_neighbors = lambda u: G_adj[u].keys()
@@ -1049,13 +1049,13 @@ def resample_attributes(G, replica, model_map, params):
     if maintain_edge_attributes and G.number_of_edges() > 0:
         if params.get('verbose', True):
             print 'Updating edge attributes ...'
-        for edge in replica.edges_iter():
+        for edge in replica.edges():
             if replica.get_edge_data(*edge) != {}:
                 continue
             elif G.has_edge(*edge):
                 edata = G.get_edge_data(*edge).copy()
-                replica.edge[edge[0]][edge[1]] = edata
-                replica.edge[edge[1]][edge[0]] = edata
+                replica[edge[0]][edge[1]] = edata
+                replica[edge[1]][edge[0]] = edata
             else:
                 modelA = model_map.get(edge[0], None)
                 modelB = model_map.get(edge[1], None)
@@ -1070,8 +1070,8 @@ def resample_attributes(G, replica, model_map, params):
                         break
 
                 edata = G.get_edge_data(nodeA, nodeB).copy()
-                replica.edge[edge[0]][edge[1]] = edata
-                replica.edge[edge[1]][edge[0]] = edata
+                replica[edge[0]][edge[1]] = edata
+                replica[edge[1]][edge[0]] = edata
 
     return replica
 
@@ -1208,7 +1208,7 @@ def seed_finder_weight_alg(G, params):
 
     for node in free_nodes:
         nearby_seeds = seeds.intersection(G_neighbors(node))
-        seed_attraction = [(seed,G.edge[node][seed].get('weight', 1.0)) for seed in nearby_seeds]
+        seed_attraction = [(seed,G[node][seed].get('weight', 1.0)) for seed in nearby_seeds]
         my_aggregate = max(seed_attraction, key=lambda x:x[1])[0]
         aggregates[my_aggregate].append(node)
         home_nodes[node] = my_aggregate
@@ -1235,9 +1235,9 @@ def strong_clustering_structure(G, u, w, params):
 
 def weighted_step(G, start_node, valid_options=None, sm=sum):
     if valid_options == None:
-        nb_wt   = [(nb,nb_data.get('weight', 1.)) for nb,nb_data in G.edge[start_node].items()]
+        nb_wt   = [(nb,nb_data.get('weight', 1.)) for nb,nb_data in G[start_node].items()]
     else:
-        nbs = G.edge[start_node]
+        nbs = G[start_node]
         nb_wt   = [(nb,nbs[nb].get('weight', 1.)) for nb in valid_options]
 
     if nb_wt.__len__() == 0:
@@ -1251,7 +1251,7 @@ def weighted_step(G, start_node, valid_options=None, sm=sum):
     return nb_wt[-1][0]
 
 def weighted_step_advanced(G, start_node, weighted_step, blocked, rds, sm=None):
-    nb_wt = G.edge[start_node].items()
+    nb_wt = G[start_node].items()
     if not weighted_step:
         #TODO: in most cases, we are fine just doing 10 random selections, and then giving up - we would just not guarantee that None means fully blocked
         rds(nb_wt)  #shuffling is O(n); selection is O(1)
@@ -1284,9 +1284,9 @@ def weighted_step_advanced(G, start_node, weighted_step, blocked, rds, sm=None):
 def weighted_step2(G, start_node, valid_options=None):
     #uses npr.multinomial.  slower than the other version
     if valid_options == None:
-        nb_wt   = [(nb,nb_data.get('weight', 1.)) for nb,nb_data in G.edge[start_node].items()]
+        nb_wt   = [(nb,nb_data.get('weight', 1.)) for nb,nb_data in G[start_node].items()]
     else:
-        nbs = G.edge[start_node]
+        nbs = G[start_node]
         nb_wt   = [(nb,nbs[nb].get('weight', 1.)) for nb in valid_options]
 
     if nb_wt.__len__() == 0:

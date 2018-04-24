@@ -1,7 +1,7 @@
 '''
 Multiscale Entropic Network Generator 2 (MUSKETEER2)
 
-Copyright (c) 2011-2015 by Alexander Gutfraind and Ilya Safro. 
+Copyright (c) 2011-2015 by Alexander Gutfraind and Ilya Safro.
 All rights reserved.
 
 Use and redistribution of this file is governed by the license terms in
@@ -29,7 +29,7 @@ import graphutils
 np.seterr(all='raise')
 
 timeNow = lambda : time.strftime('%Y_%m_%d__%H_%M_%S', time.localtime())
-       
+
 def integrity_test():
     import algorithms
     print 'Integrity testing ...'
@@ -51,10 +51,10 @@ def integrity_test():
         assert diff['del_edges'] == []
         assert diff['new_nodes'] == []
         assert diff['del_edges'] == []
-        
+
     print 'Integrity test: PASSED'
 
-def iterated_test(seed=None, testparams=None, params=None):        
+def iterated_test(seed=None, testparams=None, params=None):
     import algorithms
     print 'Starting iterative replication test...'
     if seed == None:
@@ -106,10 +106,10 @@ def smoke_test():
         #print '  nn=%d,ne=%d'%(G.number_of_nodes(), G.number_of_edges())
         replica = algorithms.generate_graph(original=G, params=params)
         #print '  nn=%d,ne=%d'%(replica.number_of_nodes(), replica.number_of_edges())
-        assert G.selfloop_edges() == []
+        assert list(G.selfloop_edges()) == []
 
     assert 0 == os.system(graphutils.MUSKETEER_EXAMPLE_CMD)
-        
+
 
     print 'Smoke test: PASSED'
     print
@@ -140,7 +140,7 @@ valid_params = {'accept_chance_edges':None,
                 'maintain_edge_attributes':None,
                 'maintain_node_attributes':None,
                 'matching_algorithm':None, #TODO document
-                'memoriless_interpolation':None,    
+                'memoriless_interpolation':None,
                 'metric_runningtime_bound':None, #TODO: document
                 'minorizing_node_deletion':None, #TODO: document
                 'new_edge_horizon':None,
@@ -160,7 +160,7 @@ valid_params = {'accept_chance_edges':None,
                 'retain_intermediates':None,
                 'seed_threshold_1':None, #TODO: document
                 'seed_threshold_2':None, #TODO: document
-                'search_method':None, #TODO: document 
+                'search_method':None, #TODO: document
                 'skip_param_sanity_check':False, #TODO: document
                 'stats_report_on_all_levels':None, #presumes retain_intermediates
                 'triangle_distribution_limit':None, #TODO: document
@@ -178,7 +178,7 @@ def validate_params(params):
                 print 'Hint: for a list of valid parameters, see valid_params variable in simpletesters.py'
                 print
             bad_params = True
-    
+
     if params.get('memoriless_interpolation', False) and params.get('deep_copying', True):
         if params.get('verbose', True):
             print 'Memoriless_interpolation=True requires deep_copying=False'
@@ -196,7 +196,7 @@ def validate_params(params):
         sys.exit(1)
 
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     smoke_test()
     integrity_test()
     iterated_test()
