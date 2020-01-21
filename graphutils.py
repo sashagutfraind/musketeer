@@ -1166,6 +1166,19 @@ def write_dot_helper(G, path, encoding='utf-8'):
             f.write(line.encode(encoding))
         f.write('}\n'.encode(encoding))
 
+def write_adjlist_implicit_prefix(G,path):
+    graph = nx.convert_node_labels_to_integers(G)  
+    myfile = open(path, 'w')
+    out = str(nx.number_of_nodes(graph)) + ' ' + str(nx.number_of_edges(graph)) + '\n'
+    for node in sorted(graph.nodes()):
+        for v in graph.neighbors(node):
+            if node != v:
+                out += str(v + 1) + ' '  # metis indexing starts from 1
+        out += '\n'
+    myfile.write(out)
+    myfile.close()
+
+
 def write_graph(G, path, params={}, list_types_and_exit=False):
     '''reads graph from path, using automatic detection of graph type
     '''
@@ -1182,6 +1195,7 @@ def write_graph(G, path, params={}, list_types_and_exit=False):
             'gml':nx.write_gml,
             'gpickle':nx.write_gpickle,
             'pajek':nx.write_pajek,
+            'adjlistImpPre':write_adjlist_implicit_prefix,
             'yaml':nx.write_yaml}
     if os.name == 'nt':
         writers['dot'] = write_dot_helper
