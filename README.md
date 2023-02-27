@@ -1,6 +1,6 @@
 Multiscale Entropic Network Generator 2 (MUSKETEER2)
 
-Copyright (c) 2011-2018 by Alexander Gutfraind and Ilya Safro. 
+Copyright (c) 2011-2023 by Alexander Gutfraind and Ilya Safro. 
 All rights reserved.
 
 Use and redistribution of this file is governed by the license terms in
@@ -9,45 +9,49 @@ the LICENSE file found in the project's top-level directory.
 Setup and Installation
 ----------------------
 Make sure your system has 
-1. Python 2.6 or 2.7
-2. NetworkX library (version >= 1.10)
-3. numpy library (version >=1.5)
+1. Python 3
+2. Installed all the packages in requirements.txt.  You can run these:
+``` 
+virtualenv -p=3.8 muskEnv
+source muskEnv/bin/activate
+pip install -r src/requirements.txt
+```
+3. Optional packages
+- pygraphviz is needed for using .dot files and for sfdp
+- graph_tool for some testing
 
-You can check this by running 
-
-python
-
-From Python:
-
-import sys, numpy, networkx
-sys.version
-numpy.__version__
-networkx.__version__
-
-Also,
-graphviz is recommended for visualization.
-
-
-
-Usage example
+Usage examples
 -------------
-python musketeer.py -f data-samples/arenas_email.edges -t edgelist -p "{'node_growth_rate':[0.005, 0.001], 'edge_edit_rate':[0.05, 0.04, 0.03], 'node_edit_rate':[0.07, 0.06, 0.05]}" -o output/test.dot
+
+```
+python musketeer.py -f data-samples/arenas_email.edges -t edgelist -p "{'node_growth_rate':[0.005, 0.001], 'edge_edit_rate':[0.05, 0.04, 0.03], 'node_edit_rate':[0.07, 0.06, 0.05]}" -o arenas_email.edges
+```
 
 explanation:
-1. Loads data-social/arenas_email.edges
+1. Loads data-samples/arenas_email.edges
 2. Increases the number of nodes by 0.9% at level 1 deep, and by 0.1% at level 0 (finest level)
 3. Edits 3% of the edges and 5% of the nodes at level 2 deep, 
    4% of edges at level 1 deep and 6% of the nodes,
    5% of edges at level 0 deep and 7% of the nodes
-4. The graph is outputed to output/test.dot (DOT format used by graphviz)
-
-#note that step 2 changes the network statistics, and is often skipped in practice
-
-#a direct call from python script:
-import algorithms
-new_G = algorithms.generate_graph(G, params)
+4. The graph is outputed to output/test.edges
 
 
+a direct call from python script:
+```
+import networkx as nx
+G = nx.erdos_renyi_graph(1000, 0.01)
+
+from musketeer import algorithms
+params = {'edge_edit_rate':[0.05, 0.05], 'node_edit_rate':[0.05, 0.05]}
+Gprime = algorithms.generate_graph(G, params)
+```
+
+running the tests: 
+```
+pip install pytest pytest-cov
+pytest -v 
+pytest --cov=musketeer
+```
 
 Special usage modes
 --------------------
@@ -200,7 +204,7 @@ Support for node and edge attributes
 * use the parameters 'maintain_node_attributes':True, 'maintain_edge_attributes':True
 
 Error writing DOT file or pygraphviz error:
-* pygraphviz is not currently functional in the Windows platform
+* pygraphviz is difficult to install particularly in the Windows platform
 * specify an alternative output file such as "-o my_output.elist"
 * or, try install/ing pydot package
 
