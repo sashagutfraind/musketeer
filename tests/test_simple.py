@@ -131,6 +131,22 @@ def test_iterated(seed=None, testparams=None, params=None):
         npr.seed(seed)
     print('PASSED')
 
+
+def test_meshtest():
+    G = graphutils.load_graph('data-samples/mesh33.edges')
+    params = {'verbose':False,
+              'node_growth_rate':[0.01], 
+    }
+
+    replica = algorithms.generate_graph(original=G, params=params)
+
+    assert replica.number_of_nodes() >= G.number_of_nodes()
+    assert replica.number_of_nodes() <= G.number_of_nodes()*1.10
+
+    assert replica.number_of_edges() >= G.number_of_edges()
+    assert replica.number_of_edges() <= G.number_of_edges()*1.10
+
+
 @pytest.mark.parametrize("directed", [False, True])
 @pytest.mark.parametrize("weighted", [False, True])
 def test_smoketest(directed, weighted):

@@ -16,5 +16,17 @@ setuptools.setup(
 	url="https://github.com/sashagutfraind/musketeer/",
 	license='GNU',
 	python_requires='>=3.8',
-	install_requires=[]
+	install_requires=["Pillow>=9.4.0,<10.0.0", "PyYAML>=6.0,<7.0", 
+						"matplotlib>=3.7.0,<3.8.0", "networkx>=3.0,<3.1", 
+						"numpy>=1.24.2,<1.25.0", "scipy>=1.10.0,<1.12.0"
+	],
+	extra_require={
+		'dev': ["pytest>=7.2.1", "pytest-cov"]
+	},
+	classifiers=[
+          'Intended Audience :: Scientists',
+          'License :: OSI Approved :: GNU',
+          'Programming Language :: Python',
+          'Topic :: Network Analysis'
+          ]
 )
